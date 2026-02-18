@@ -1,4 +1,4 @@
-let currentProducts = []; // Store fetched products locally so we can open details instantly
+let currentProducts = [];
 let currentPage = 1;
 let isSearchMode = false;
 
@@ -49,7 +49,6 @@ function resetCatalog() {
     document.getElementById('searchInput').value = "";
     isSearchMode = false;
     currentPage = 1;
-    // Clear detail view if open
     goBack(); 
     fetchCatalog(currentPage);
 }
@@ -65,7 +64,7 @@ function showProductDetail(index) {
     document.getElementById('detailView').style.display = 'block';
     window.scrollTo(0, 0);
 
-    // 2. Populate Basic Info (English fallback)
+    // 2. Populate Basic Info
     const name = getLocalizedText(p.BnrShortText, "Unknown Product");
     const desc = getLocalizedText(p.Description, "No description available.");
     
@@ -81,7 +80,7 @@ function showProductDetail(index) {
         imgElement.src = "https://placehold.co/400x300?text=No+Image";
     }
 
-    // 4. Populate Features (Bullet points)
+    // 4. Populate Features
     const featureDiv = document.getElementById('detailFeatures');
     featureDiv.innerHTML = "";
     const features = p.Features?.find(x => x.Language === 'en')?.Texts || [];

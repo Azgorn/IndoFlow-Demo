@@ -2,19 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const path = require('path'); // NEW: Required for file paths
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- NEW: SERVE STATIC FILES ---
-// This tells Node to serve index.html, style.css, etc. from the current folder
 app.use(express.static(__dirname));
 
 const AUTH_URL = "https://sandbox.auth.boschrexroth.com/auth/realms/dc5/protocol/openid-connect/token";
 const BASE_URL = "https://induflow-demo.boschrexroth.com/api/v1";
-const PORT = process.env.PORT || 3000; // Updated to support Render's port
+const PORT = process.env.PORT || 3000;
 
 // --- TOKEN MANAGER ---
 let cachedToken = null;
@@ -91,8 +89,8 @@ app.get('/api/image/:id', async (req, res) => {
     }
 });
 
-// --- NEW: CATCH-ALL ROUTE ---
-// If the user goes to "your-site.com/", send them index.html
+// --- CATCH-ALL ROUTE ---
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
