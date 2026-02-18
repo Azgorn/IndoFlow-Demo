@@ -2,14 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const path = require('path'); // NEW: Required for file paths
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --- NEW: SERVE STATIC FILES ---
+// This tells Node to serve index.html, style.css, etc. from the current folder
+app.use(express.static(__dirname));
+
 const AUTH_URL = "https://sandbox.auth.boschrexroth.com/auth/realms/dc5/protocol/openid-connect/token";
 const BASE_URL = "https://induflow-demo.boschrexroth.com/api/v1";
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Updated to support Render's port
 
 // --- TOKEN MANAGER ---
 let cachedToken = null;
@@ -33,9 +38,9 @@ async function getToken() {
     }
 }
 
-// --- ENDPOINTS ---
+// --- API ENDPOINTS ---
 
-// 1. Catalog (Pagination)
+// 1. Catalog
 app.get('/api/catalog', async (req, res) => {
     const page = req.query.page || 1;
     const size = req.query.size || 9;
@@ -51,14 +56,13 @@ app.get('/api/catalog', async (req, res) => {
     }
 });
 
-// 2. Search (By Number)
+// 2. Search
 app.get('/api/search', async (req, res) => {
     const userInput = req.query.number;
     if (!userInput) return res.status(400).json({ error: "Missing number" });
 
     try {
         const token = await getToken();
-        // Uses the POST endpoint for specific lookup
         const response = await axios.post(
             `${BASE_URL}/product/query`, 
             { "Number": userInput, "MachineType": null }, 
@@ -87,4 +91,10 @@ app.get('/api/image/:id', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// --- NEW: CATCH-ALL ROUTE ---
+// If the user goes to "your-site.com/", send them index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
