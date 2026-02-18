@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bosch Rexroth Catalog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>PartHub Catalog</h1>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search Part Number (e.g. 0510545001)...">
+                <button onclick="handleSearch()">Search</button>
+                <button onclick="resetCatalog()" class="secondary">Reset</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="loader" class="loader" style="display:none;"></div>
+        <div id="errorMsg" class="error"></div>
+        
+        <div id="catalogView">
+            <div id="productGrid" class="grid-container"></div>
+            
+            <div id="pagination" class="pagination">
+                <button id="prevBtn" onclick="changePage(-1)">Previous</button>
+                <span id="pageIndicator">Page 1</span>
+                <button id="nextBtn" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+
+        <div id="detailView" class="detail-container" style="display:none;">
+            <button class="back-btn" onclick="goBack()">← Back to Results</button>
+            
+            <div class="product-header">
+                <div class="image-box">
+                    <img id="detailImage" src="" alt="Product Image">
+                </div>
+                <div class="info-box">
+                    <h2 id="detailTitle">Product Name</h2>
+                    <h3 id="detailNum">R900000000</h3>
+                    <p id="detailDesc">Description goes here...</p>
+                    
+                    <div id="detailFeatures" class="features-list"></div>
+                </div>
+            </div>
+
+            <div class="specs-section">
+                <h3>Technical Properties</h3>
+                <table id="specsTable">
+                    </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
