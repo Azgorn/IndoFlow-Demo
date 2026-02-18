@@ -1,4 +1,4 @@
-let currentProducts = [];
+let currentProducts = []; 
 let currentPage = 1;
 let isSearchMode = false;
 
@@ -9,11 +9,12 @@ window.onload = () => fetchCatalog(1);
 async function fetchCatalog(page) {
     showLoading(true);
     try {
-        const res = await fetch(`http://localhost:3000/api/catalog?page=${page}&size=9`);
+        const res = await fetch(`/api/catalog?page=${page}&size=9`);
         const data = await res.json();
+        
         if (!res.ok) throw new Error("Failed to load catalog");
 
-        currentProducts = data; // Save for detail view
+        currentProducts = data; 
         renderGrid(data);
         updatePaginationUI(page, false);
     } catch (err) {
@@ -30,11 +31,13 @@ async function handleSearch() {
     isSearchMode = true;
     showLoading(true);
     try {
-        const res = await fetch(`http://localhost:3000/api/search?number=${input}`);
+        // FIX 2: Relative URL here too
+        const res = await fetch(`/api/search?number=${input}`);
         const data = await res.json();
+        
         if (!res.ok) throw new Error(data.error || "Search failed");
 
-        currentProducts = data; // Save for detail view
+        currentProducts = data; 
         renderGrid(data);
         updatePaginationUI(1, true);
     } catch (err) {
@@ -59,12 +62,10 @@ function showProductDetail(index) {
     const p = currentProducts[index];
     if (!p) return;
 
-    // 1. Hide Grid, Show Detail
     document.getElementById('catalogView').style.display = 'none';
     document.getElementById('detailView').style.display = 'block';
     window.scrollTo(0, 0);
 
-    // 2. Populate Basic Info
     const name = getLocalizedText(p.BnrShortText, "Unknown Product");
     const desc = getLocalizedText(p.Description, "No description available.");
     
@@ -72,15 +73,14 @@ function showProductDetail(index) {
     document.getElementById('detailNum').innerText = p.IamNumber || p.Id;
     document.getElementById('detailDesc').innerText = desc;
 
-    // 3. Image
     const imgElement = document.getElementById('detailImage');
     if (p.Image && p.Image.ResourceId) {
-        imgElement.src = `http://localhost:3000/api/image/${p.Image.ResourceId}`;
+        // FIX 3: Relative URL for images
+        imgElement.src = `/api/image/${p.Image.ResourceId}`;
     } else {
         imgElement.src = "https://placehold.co/400x300?text=No+Image";
     }
 
-    // 4. Populate Features
     const featureDiv = document.getElementById('detailFeatures');
     featureDiv.innerHTML = "";
     const features = p.Features?.find(x => x.Language === 'en')?.Texts || [];
@@ -88,7 +88,6 @@ function showProductDetail(index) {
         featureDiv.innerHTML = "<h4>Features:</h4><ul>" + features.map(f => `<li>${f}</li>`).join('') + "</ul>";
     }
 
-    // 5. Populate Specs Table
     const table = document.getElementById('specsTable');
     table.innerHTML = "";
     if (p.Properties && p.Properties.length > 0) {
@@ -96,12 +95,11 @@ function showProductDetail(index) {
             const row = table.insertRow();
             row.insertCell(0).innerText = prop.Name;
             
-            // Handle values that might have units
             let valStr = "N/A";
             if(prop.Value && prop.Value.Value !== undefined) {
                 valStr = `${prop.Value.Value} ${prop.Value.Unit || ''}`;
             } else if (prop.Value && prop.Value.Value) {
-                valStr = prop.Value.Value; // Text value
+                valStr = prop.Value.Value; 
             }
             row.insertCell(1).innerText = valStr;
         });
@@ -130,11 +128,12 @@ function renderGrid(products) {
     products.forEach((p, index) => {
         const name = getLocalizedText(p.BnrShortText, "Unknown Product");
         const shortDesc = getLocalizedText(p.MaterialShortText, "");
-        const imgUrl = p.Image?.ResourceId ? `http://localhost:3000/api/image/${p.Image.ResourceId}` : 'https://placehold.co/300x200?text=No+Image';
+        
+        // FIX 4: Relative URL for grid images
+        const imgUrl = p.Image?.ResourceId ? `/api/image/${p.Image.ResourceId}` : 'https://placehold.co/300x200?text=No+Image';
 
         const card = document.createElement('div');
         card.className = 'card';
-        // Pass the INDEX to the click handler
         card.onclick = () => showProductDetail(index);
         
         card.innerHTML = `
@@ -148,7 +147,6 @@ function renderGrid(products) {
     });
 }
 
-// Helper to find English text or default to first available
 function getLocalizedText(array, defaultText) {
     if (!array || !Array.isArray(array) || array.length === 0) return defaultText;
     return array.find(x => x.Language === 'en')?.Text || array[0]?.Text || defaultText;
